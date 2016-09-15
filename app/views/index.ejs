@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div>
+    			<h1>API consulta Informações Endereços</h1>
+    			<h2>api-correios-search</h2>
+		  </div>
+	<pre>
+
+	<h3> API de busca de informações de endereço por CEP ou por Logradouro, Cidade e Estado.</h3>
+
+	Parametros Obrigatórios:
+
+		Buscar informações por CEP : 
+			O único parametro obrigatório é o CEP (key zipcode), e somente os números.
+ 		
+ 		Buscar informações por endereço:
+ 			É obrigatório informar o Logradouro (key street), cidade (key city) e Estado (key state), onde no Estado é a SIGLA do estado (exemplo: Rio Grande do Sul deve ser informado RS).
+
+	URL : DOMAIN/findInfoAddressByParams, onde o Domain atual é api-correios.herokuapp.com
+	Method : GET
+	Params : {
+		street : Logradouro (Julio de Castilhos, por exemplo)
+		number : Número da residência (667, por exemplo)
+		state : Sigla do Estado (RS, por exemplo)
+		city : Cidade da Busca (Campo Bom, por exemplo)
+		zipcode: Número do CEP (95600000, por exemplo)
+		nextPage : Número da página que quer do result set (2, por exemplo). Default é a 0 (primeira página de registros)
+	}
+
+	OBS 1 : O Número de registros por páginas é 50 sempre.
+	OBS 2 : O layout dessa doc está um lixo, quando tiver tempo/vontade será melhorado =]
+
+	Exemplo (Assumindo que está utilizando Jquery) :
+
+	var _test = function () {
+		var data = {street : 'Joao', number : '', city : 'Porto Alegre', state : 'RS', nextPage: 2};
+		var urlRequest = 'http://api-correios.herokuapp.com/findInfoAddressByParams';
+		$.ajax({
+			url: urlRequest,
+			type: 'GET',
+			data: data,
+			beforeSend: function () {
+				console.log("start at : " + new Date());
+			},
+			success: function (data) {
+				console.log('SUCCESS !!!');
+				console.log('results :' + data.results.length);
+				console.log('page :' + data.currentPage);
+			},
+			error: function () {
+				console.log('ERROR');
+			},
+			complete: function () {
+				console.log("end at : " + new Date());
+			}
+		});
+	};
+
+	No código acima será realizado uma consulta pelo estado do Rio Grande do Sul (RS), cidade de Porto Alegre onde o Logradouro contenha 
+	'Joao' no nome e a página do result set é a 2, ou seja, será do 101 até o 150 registro.
+
+	Retorno: 
+		O retorno é um JSON que contém um array de resultados da pesquisa e qual é a página atual da consulta, onde o
+		result set estará na key results e a página atual consultada estará na key currentPage. Exemplo: 
+			{currentPage: 2, results: [{street: '...', district: '...', city: '...', zipcode: '...'}, {street: '...', district: '...', city: '...', zipcode: '...'}]}
+
+		O currentPage é para informar qual é a sua página atual do result set, pois algumas consultas podem retornar mais de 50 registros,
+		então assumindo que o endereço que procura não está na página atual, você poderá reenviar a request porém adicionando aos 
+		parâmetros a key 'nextPage : (currentPage + 1)', dai retornará a página seguinte da requisição ou caso queira poderá solicitar 
+		a página anterior, passando na key 'nextpage : (currentPage - 1)'.
+
+	Para entender Melhor :
+
+		nextPage = "" ou "0" -> retornará os registros 1 até o 50 do result set
+		nextPage = 1 -> retornará os registros 51 até o 100 do result set
+		nextPage = 2 -> retornará os registros 101 até o 150 do result set
+		nextPage = 3 -> retornará os registros 151 até o 200 do result set
+		e assim por diante. Como descrito anteriormente, se você leu a doc (ehuheuheuheueh), é 50 registros por result set.
+		Existem consulta que chegam a perto de 2000 registros, dai precisa paginar bastante...
+		Na sequência tem um form que pode fazer as requests para testar, e logo a baixo cria um listagem dos resultados.
+	</pre>
+		</div>
+</div>
+	<form class="form-sample" style="padding: 15px;">
+		<div class="form-group">
+		  <label for="street">Street:</label>
+		  <input type="text" name="street" class="form-control" id="street">
+		</div>
+		<div class="form-group">
+		  <label for="city">City:</label>
+		  <input type="text" name="city" class="form-control" id="city">
+		</div>
+		<div class="form-group">
+		  <label for="city">State:</label>
+		  <select class="form-control" name="state" id="state">
+			<option value="AC">AC</option>
+			<option value="AL">AL</option>
+			<option value="AM">AM</option>
+			<option value="AP">AP</option>
+			<option value="BA">BA</option>
+			<option value="CE">CE</option>
+			<option value="DF">DF</option>
+			<option value="ES">ES</option>
+			<option value="GO">GO</option>
+			<option value="MA">MA</option>
+			<option value="MG">MG</option>
+			<option value="MS">MS</option>
+			<option value="MT">MT</option>
+			<option value="PA">PA</option>
+			<option value="PB">PB</option>
+			<option value="PE">PE</option>
+			<option value="PI">PI</option>
+			<option value="PR">PR</option>
+			<option value="RJ">RJ</option>
+			<option value="RN">RN</option>
+			<option value="RO">RO</option>
+			<option value="RR">RR</option>
+			<option value="RS">RS</option>
+			<option value="SC">SC</option>
+			<option value="SE">SE</option>
+			<option value="SP">SP</option>
+			<option value="TO">TO</option>
+		  </select>
+		</div>
+		<div class="form-group">
+		  <label for="number">Number:</label>
+		  <input type="number" name="number" class="form-control" id="number">
+		</div>
+		</br>
+		<span>OR</span>
+		</br>
+		<div class="form-group">
+		  <label for="zipcode">ZipCode:</label>
+		  <input type="number" name="zipcode" class="form-control" id="zipcode">
+		</div>
+		
+		</br>
+		<input type="hidden" name="nextPage" value="0"/>
+		<input type="button" value="Test" onclick="_sample();"/>
+	</form>
+	<div>
+		<ul class="results">
+
+		</ul>
+	</div>
+		<pre>
+			Código do Exemplo : 
+			var _sample = function () {
+				var params = $(".form-sample").serialize();
+				var urlRequest = 'http://api-correios.herokuapp.com/findInfoAddressByParams';
+				$.ajax({
+					url: urlRequest,
+					type: 'GET',
+					data: params,
+					beforeSend: function () {
+						console.log("start at : " + new Date());
+					},
+					success: function (data) {
+						console.log('SUCCESS !!!');
+						console.log('results :' + data.results.length);
+						console.log('page :' + data.currentPage);
+						_sampleCallback(data);
+					},
+					error: function () {
+						console.log('ERROR');
+					},
+					complete: function () {
+						console.log("end at : " + new Date());
+					}
+				});
+			};
+
+			var _sampleCallback = function (data) {
+				document.querySelector("[name='nextPage']").value = parseInt(data.currentPage) + 1;
+				var ul = document.querySelector(".results");
+				var l = document.createElement("li");
+				l.innerHTML = "------- PAGE RESULT " + data.currentPage;
+				ul.appendChild(l);
+				for (var i = 0; i < data.results.length; i++) {
+					var d = data.results[i];
+					var str = d.street + ',' + d.district + ',' + d.city + ',' + d.zipcode;
+					var li = document.createElement("li");
+					li.innerHTML = str;
+					ul.appendChild(li);
+				}
+			};
+		</pre>
+
+	<div>
+		<a href="https://github.com/leandrokohlrausch" target="_blank">
+			<i class="fa fa-github fa-2" aria-hidden="true"> leandrokohlrausch </i>
+		</a>
+	</div>
+</div>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+			var _sample = function () {
+				var params = $(".form-sample").serialize();
+				var urlRequest = 'http://api-correios.herokuapp.com/findInfoAddressByParams';
+				$.ajax({
+					url: urlRequest,
+					type: 'GET',
+					data: params,
+					beforeSend: function () {
+						console.log("start at : " + new Date());
+					},
+					success: function (data) {
+						console.log('SUCCESS !!!');
+						console.log('results :' + data.results.length);
+						console.log('page :' + data.currentPage);
+						_sampleCallback(data);
+					},
+					error: function () {
+						console.log('ERROR');
+					},
+					complete: function () {
+						console.log("end at : " + new Date());
+					}
+				});
+			};
+
+			var _sampleCallback = function (data) {
+				document.querySelector("[name='nextPage']").value = parseInt(data.currentPage) + 1;
+				var ul = document.querySelector(".results");
+				var l = document.createElement("li");
+				l.innerHTML = "------- PAGE RESULT " + data.currentPage;
+				ul.appendChild(l);
+				for (var i = 0; i < data.results.length; i++) {
+					var d = data.results[i];
+					var str = d.street + ',' + d.district + ',' + d.city + ',' + d.zipcode;
+					var li = document.createElement("li");
+					li.innerHTML = str;
+					ul.appendChild(li);
+				}
+			};
+</script>
+</body>
+</html>

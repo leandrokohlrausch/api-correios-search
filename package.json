@@ -1,0 +1,20 @@
+{
+  "name": "api-correios-search",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "private" : true, 
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Leandro Kohlrausch",
+  "license": "MIT",
+  "dependencies": {
+    "express" : "*",
+    "ejs" : "*",
+    "body-parser" : "*",
+    "morgan" : "*",
+    "request" : "*",
+    "cheerio" : "*"
+  }
+}
